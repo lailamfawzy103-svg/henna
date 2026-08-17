@@ -1,549 +1,413 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
-<head>
-  <meta charset="UTF-8">
+const loader =
+  document.getElementById("loader");
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  >
+const app =
+  document.getElementById("app");
 
-  <meta
-    name="theme-color"
-    content="#d9c8b3"
-  >
+const openButton =
+  document.getElementById("openButton");
 
-  <title>Ahmed & Shahd</title>
+const envelopeStage =
+  document.getElementById("envelopeStage");
 
-  <!-- GOOGLE FONTS -->
+const envelopeScreen =
+  document.getElementById("envelopeScreen");
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+const clickHint =
+  document.getElementById("clickHint");
 
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
+const attendBtn =
+  document.getElementById("attendBtn");
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink&family=Badeen+Display&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap"
-    rel="stylesheet"
-  >
+const declineBtn =
+  document.getElementById("declineBtn");
 
-  <link rel="stylesheet" href="style.css">
+const guests =
+  document.getElementById("guests");
 
-</head>
+const envelope =
+  document.getElementById("envelope");
 
-<body>
 
-  <!-- LOADING SCREEN -->
+/* =========================================================
+   LOADING SCREEN
+========================================================= */
 
-  <div class="loader" id="loader">
+window.addEventListener("load", () => {
 
-    <div class="loader-monogram">
-      AS
-    </div>
+  setTimeout(() => {
 
-    <div class="loader-line"></div>
+    loader.classList.add("hide");
 
-    <div class="loader-names">
-      AHMED &amp; SHAHd
-    </div>
+  }, 1500);
 
-  </div>
+});
 
 
-  <!-- MAIN APP -->
+/* =========================================================
+   COUNTDOWN
+========================================================= */
 
-  <main class="app" id="app">
+const eventDate =
+  new Date(
+    "2026-08-20T21:00:00"
+  ).getTime();
 
-    <!-- ENVELOPE SCREEN -->
 
-    <section
-      class="envelope-screen"
-      id="envelopeScreen"
-    >
+function updateCountdown() {
 
-      <div class="ambient-light"></div>
+  const now =
+    new Date().getTime();
 
-      <div
-        class="envelope-stage"
-        id="envelopeStage"
-      >
+  const difference =
+    eventDate - now;
 
-        <div class="ground-shadow"></div>
 
+  const daysElement =
+    document.getElementById("days");
 
-        <!-- PAPER -->
+  const hoursElement =
+    document.getElementById("hours");
 
-        <div
-          class="paper-wrapper"
-          id="paperWrapper"
-        >
+  const minutesElement =
+    document.getElementById("minutes");
 
-          <div class="paper-shadow"></div>
 
-          <div class="paper">
+  if (
+    !daysElement ||
+    !hoursElement ||
+    !minutesElement
+  ) {
+    return;
+  }
 
-            <div class="paper-texture"></div>
 
-            <div class="paper-monogram">
+  if (difference <= 0) {
 
-              <span>
-                AS
-              </span>
+    daysElement.textContent = "00";
+    hoursElement.textContent = "00";
+    minutesElement.textContent = "00";
 
-            </div>
+    return;
+  }
 
-          </div>
 
-        </div>
+  const days =
+    Math.floor(
+      difference /
+      (1000 * 60 * 60 * 24)
+    );
 
 
-        <!-- ENVELOPE -->
+  const hours =
+    Math.floor(
+      (
+        difference %
+        (1000 * 60 * 60 * 24)
+      ) /
+      (1000 * 60 * 60)
+    );
 
-        <div
-          class="envelope"
-          id="envelope"
-        >
 
-          <div class="envelope-back"></div>
+  const minutes =
+    Math.floor(
+      (
+        difference %
+        (1000 * 60 * 60)
+      ) /
+      (1000 * 60)
+    );
 
-          <div class="envelope-panel envelope-left"></div>
 
-          <div class="envelope-panel envelope-right"></div>
+  daysElement.textContent =
+    String(days).padStart(2, "0");
 
-          <div class="envelope-bottom"></div>
+  hoursElement.textContent =
+    String(hours).padStart(2, "0");
 
+  minutesElement.textContent =
+    String(minutes).padStart(2, "0");
 
-          <!-- TOP FLAP -->
+}
 
-          <div
-            class="flap"
-            id="flap"
-          >
 
-            <div class="flap-surface">
+updateCountdown();
 
-              <div class="flap-highlight"></div>
+setInterval(
+  updateCountdown,
+  1000
+);
 
 
-              <!-- SEAL -->
+/* =========================================================
+   OPEN ENVELOPE
+========================================================= */
 
-              <button
-                class="seal"
-                id="openButton"
-                type="button"
-                aria-label="فتح الدعوة"
-              >
+let opened = false;
 
-                <span class="seal-inner">
-                  AS
-                </span>
 
-              </button>
+openButton.addEventListener("click", () => {
 
-            </div>
+  if (opened) {
+    return;
+  }
 
-          </div>
+  opened = true;
 
-        </div>
 
+  /* HIDE HINT */
 
-        <!-- CLICK HINT -->
+  clickHint.style.opacity = "0";
 
-        <div
-          class="click-hint"
-          id="clickHint"
-        >
-          اضغطي لفتح الدعوة
-        </div>
 
-      </div>
+  /*
+    IMPORTANT:
+    أول حاجة الظرف يفتح.
+  */
 
-    </section>
+  envelopeStage.classList.add(
+    "opened"
+  );
 
 
-    <!-- INVITATION PAGE -->
+  /*
+    بعد ما الجوانب تبدأ تفتح،
+    الورقة تطلع من النص.
+  */
 
-    <section
-      class="invitation-page"
-      id="invitationPage"
-    >
+  setTimeout(() => {
 
-      <div class="invitation-background"></div>
+    envelopeStage.classList.add(
+      "sparkle"
+    );
 
+  }, 1450);
 
-      <article class="invitation-card">
 
-        <div class="invitation-frame">
+  setTimeout(() => {
 
-          <div class="invitation-inner-frame"></div>
+    /*
+      هنا الورقة تبدأ تطلع
+      من منتصف الظرف
+    */
 
-        </div>
+    envelopeStage.classList.add(
+      "opened-paper"
+    );
 
+  }, 900);
 
-        <div class="invitation-content">
 
+  /*
+    تكبير الورقة بعد خروجها
+  */
 
-          <!-- QURAN -->
+  setTimeout(() => {
 
-          <div class="quran-section reveal-item">
+    envelopeStage.classList.add(
+      "invitation-expand"
+    );
 
-            <div class="bismillah">
-              بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
-            </div>
+  }, 2150);
 
-            
 
-            <div class="quran-ayah">
+  /*
+    إظهار صفحة الدعوة
+  */
 
-              وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ
-              أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا
-              وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً
+  setTimeout(() => {
 
-            </div>
+    app.classList.add(
+      "show-invitation"
+    );
 
-          </div>
+  }, 2350);
 
 
-          <!-- INTRO -->
+  /*
+    إخفاء الظرف
+  */
 
-          <div class="intro-section reveal-item">
+  setTimeout(() => {
 
-                              
+    envelopeStage.classList.add(
+      "envelope-hide"
+    );
 
-            <div class="invitation-line">
-              يسر د. هدى مدحت دعوتكم لحضور حفل حنة
-            </div>
+  }, 3550);
 
 
-            <div class="names">
+  /*
+    إنهاء شاشة الظرف
+  */
 
-              <span class="couple-name">
-                أحمد
-              </span>
+  setTimeout(() => {
 
-              <i>
-                &amp;
-              </i>
+    envelopeScreen.classList.add(
+      "completely-hidden"
+    );
 
-              <span class="couple-name">
-                شهد
-              </span>
+    envelopeStage.classList.add(
+      "finished"
+    );
 
-            </div>
+  }, 4100);
 
-          </div>
 
+  setTimeout(() => {
 
-          <!-- DIVIDER 1 -->
+    document.body.style.overflowY =
+      "auto";
 
-          <div class="modern-divider reveal-item">
+  }, 4200);
 
-            <span></span>
+});
 
-            <b>✦</b>
 
-            <span></span>
+/* =========================================================
+   RSVP
+========================================================= */
 
-          </div>
+attendBtn.addEventListener(
+  "click",
+  () => {
 
+    attendBtn.classList.add(
+      "selected"
+    );
 
-          <!-- DETAILS -->
+    declineBtn.classList.remove(
+      "selected"
+    );
 
-          <div class="details-section reveal-item">
+    guests.classList.add(
+      "show"
+    );
 
-            <div class="section-kicker">
-              تفاصيل الحفل
-            </div>
+  }
+);
 
-            <div class="date">
-              20.8.2026
-            </div>
 
-            <div class="time">
-              الساعة 9 مساء عقب صلاة العشاء
-            </div>
+declineBtn.addEventListener(
+  "click",
+  () => {
 
-            <div class="location">
+    declineBtn.classList.add(
+      "selected"
+    );
 
-              <div class="location-name">
-                بمنزل د. محمد فوزي رياض
-              </div>
+    attendBtn.classList.remove(
+      "selected"
+    );
 
-              <button
-                class="location-button"
-                type="button"
-              >
-                الموقع
-              </button>
+    guests.classList.remove(
+      "show"
+    );
 
-            </div>
+  }
+);
 
-          </div>
 
-          <div class="modern-divider soft reveal-item">
+/* =========================================================
+   DESKTOP PARALLAX
+========================================================= */
 
-            <span></span>
+const desktopPointer =
+  window.matchMedia(
+    "(pointer:fine)"
+  );
 
-            <b>✦</b>
 
-            <span></span>
+if (desktopPointer.matches) {
 
-          </div>
+  document.addEventListener(
+    "mousemove",
+    (event) => {
 
+      if (opened) {
+        return;
+      }
 
 
-          <!-- COUNTDOWN -->
+      const x =
+        (
+          event.clientX /
+          window.innerWidth -
+          0.5
+        ) * 2;
 
-          <div class="countdown-section reveal-item">
 
-            <div class="section-kicker">
-      Countdown
-            </div>
+      const y =
+        (
+          event.clientY /
+          window.innerHeight -
+          0.5
+        ) * 2;
 
-            <div class="countdown">
 
-              <div class="count-item">
+      envelope.style.transform =
+        `
+        translate(-50%, -50%)
+        rotateY(${x * 2}deg)
+        rotateX(${y * -1.2}deg)
+        `;
 
-                <span id="days">
-                  00
-                </span>
+    }
+  );
 
-                <small>
-                  أيام
-                </small>
+}
 
-              </div>
 
+/* =========================================================
+   RESET PARALLAX
+========================================================= */
 
-              <div class="count-divider"></div>
+openButton.addEventListener(
+  "click",
+  () => {
 
+    envelope.style.transform =
+      "translate(-50%, -50%)";
 
-              <div class="count-item">
+  },
+  {
+    once: true
+  }
+);
 
-                <span id="hours">
-                  00
-                </span>
 
-                <small>
-                  ساعات
-                </small>
+/* =========================================================
+   MOBILE DOUBLE TAP PROTECTION
+========================================================= */
 
-              </div>
+let lastTouchEnd = 0;
 
 
-              <div class="count-divider"></div>
+document.addEventListener(
+  "touchend",
+  (event) => {
 
+    const now =
+      Date.now();
 
-              <div class="count-item">
 
-                <span id="minutes">
-                  00
-                </span>
+    if (
+      now - lastTouchEnd <= 300
+    ) {
 
-                <small>
-                  دقائق
-                </small>
+      event.preventDefault();
 
-              </div>
+    }
 
-            </div>
 
-          </div>
+    lastTouchEnd = now;
 
-
-          <!-- DIVIDER 2 -->
-
-          <div class="modern-divider soft reveal-item">
-
-            <span></span>
-
-            <b>✦</b>
-
-            <span></span>
-
-          </div>
-
-
-          <!-- RSVP -->
-
-          <div class="rsvp-section reveal-item">
-
-            <div class="section-kicker">
-              حضوركم يسعدنا
-            </div>
-
-            <div class="form-group">
-
-              <label for="guestName">
-
-                الاسم
-
-                <em>
-                  (إجباري)
-                </em>
-
-              </label>
-
-              <input
-                id="guestName"
-                type="text"
-                placeholder="اكتبي الاسم"
-              >
-
-            </div>
-
-
-            <div class="rsvp-buttons">
-
-              <button
-                class="rsvp-btn attend"
-                id="attendBtn"
-                type="button"
-              >
-                سأحضر
-              </button>
-
-              <button
-                class="rsvp-btn decline"
-                id="declineBtn"
-                type="button"
-              >
-                أعتذر عن الحضور
-              </button>
-
-            </div>
-
-
-            <div
-              class="guests"
-              id="guests"
-            >
-
-              <label for="guestCount">
-
-                عدد المرافقين
-
-                <em>
-                  (اختياري)
-                </em>
-
-              </label>
-
-              <input
-                id="guestCount"
-                type="number"
-                min="0"
-                max="10"
-                placeholder="عدد المرافقين"
-              >
-
-            </div>
-
-          </div>
-
-
-          <!-- WISHES -->
-
-          <div class="wishes-section reveal-item">
-
-            <div class="section-kicker">
-           اكتبوا لنا كلمة تبقى ذكرى
-            </div>
-
-
-
-            <div class="form-group">
-
-              <label for="wishName">
-
-                الاسم
-
-                <em>
-                  (إجباري)
-                </em>
-
-              </label>
-
-              <input
-                id="wishName"
-                type="text"
-                placeholder="اكتبي الاسم"
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="wishText">
-
-                الأمنية
-
-                <em>
-                  (إجباري)
-                </em>
-
-              </label>
-
-              <textarea
-                id="wishText"
-                rows="3"
-                placeholder="اكتبي أمنيتك للعروسين"
-              ></textarea>
-
-            </div>
-
-          </div>
-
-
-          <!-- FINAL -->
-
-          <div class="final-section reveal-item">
-
-            <div class="final-ornament">
-
-              <span></span>
-
-              <b>
-                ✦
-              </b>
-
-              <span></span>
-
-            </div>
-
-            <div class="final-text">
-              بارك الله لهما وبارك عليهما
-            </div>
-
-            <div class="final-text">
-              وجمع بينهما في خير
-            </div>
-
-          </div>
-
-
-          <!-- BOTTOM MONOGRAM -->
-
-          <div class="bottom-monogram reveal-item">
-            AS
-          </div>
-
-        </div>
-
-      </article>
-
-    </section>
-
-  </main>
-
-
-  <script src="script.js"></script>
-
-</body>
-
-</html>
+  },
+  {
+    passive: false
+  }
+);
